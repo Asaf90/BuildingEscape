@@ -2,6 +2,7 @@
 
 
 #include "OpenDoor.h"
+#include "GameFramework/Actor.h"
 
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
@@ -19,8 +20,6 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
 }
 
 
@@ -29,6 +28,14 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	// UE_LOG(LogTemp, Warning, TEXT("Current Yaw value: %f"), GetOwner()->GetActorRotation().Yaw);	// debug line
+	// UE_LOG(LogTemp, Warning, TEXT("Current FTransform: %s"), *GetOwner()->GetActorRotation().ToString());	// debug line
+
+
+
+	// FRotator CurrentRotation =  GetOwner()->GetActorRotation();
+	// CurrentRotation.Yaw -= 90.0f;
+	// GetOwner()->SetActorRotation(CurrentRotation);
+
 }
 
