@@ -12,8 +12,6 @@ UOpenDoor::UOpenDoor()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -30,7 +28,6 @@ void UOpenDoor::BeginPlay()
 	}
 	
 	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
-
 }
 
 
@@ -42,24 +39,29 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	if (PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens))
 	{
 		OpenDoor(DeltaTime);
+		DoorLastOpen = GetWorld()->GetTimeSeconds();
 	}
 	else
 	{
-		CloseDoor(DeltaTime);
+		if (GetWorld()->GetTimeSeconds() - DoorLastOpen >= DoorCloseDelay)
+		{
+			CloseDoor(DeltaTime);
+			
+		}
 	}
 }
 
 void UOpenDoor::OpenDoor(float DeltaTime)
 {
 	FRotator CurrentRotator = GetOwner()->GetActorRotation();
-	CurrentRotator.Yaw = FMath::FInterpTo(CurrentRotator.Yaw, OpenYaw, DeltaTime, 2);
+	CurrentRotator.Yaw = FMath::FInterpTo(CurrentRotator.Yaw, OpenYaw, DeltaTime, DoorOpenSpeedParameter);
 	GetOwner()->SetActorRotation(CurrentRotator);
 }
 
 void UOpenDoor::CloseDoor(float DeltaTime)
 {
 	FRotator CurrentRotator = GetOwner()->GetActorRotation();
-	CurrentRotator.Yaw = FMath::FInterpTo(CurrentRotator.Yaw, ClosedYaw, DeltaTime, 2);
+	CurrentRotator.Yaw = FMath::FInterpTo(CurrentRotator.Yaw, ClosedYaw, DeltaTime, DoorCloseSpeedParameter);
 	GetOwner()->SetActorRotation(CurrentRotator);
 }
 
