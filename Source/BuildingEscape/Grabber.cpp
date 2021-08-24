@@ -23,7 +23,32 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Grabber component initialized on %s"), *GetOwner()->GetName());
+	// UE_LOG(LogTemp, Warning, TEXT("Grabber component initialized on %s"), *GetOwner()->GetName());
+
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	if (PhysicsHandle)
+	{
+		// Physics Handle is found.
+	}
+	else
+	{
+		UE_LOG(LogTemp, 
+		Error, 
+		TEXT("%s has no PhysicsHandle component! To fix this, double click on %s in the content browser, then Add Component -> PhysicsHandle."), 
+		*GetOwner()->GetName(),
+		*GetOwner()->GetName()
+		)
+	}
+	
+	if (GetOwner()->FindComponentByClass<UInputComponent>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Found Input Component"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Did not find Input Component"));
+	}
+	
 	
 }
 
@@ -42,6 +67,16 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	FVector LineTraceEnd = ViewPointLocation + ViewPointRotation.Vector() * Reach;
 	DrawDebugLine(GetWorld(), ViewPointLocation, LineTraceEnd, FColor(128,255,64), false, 0.0f, 0, 5.0f);
+
+	FHitResult Hit;
+	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
+	GetWorld()->LineTraceSingleByObjectType(OUT Hit,ViewPointLocation, LineTraceEnd, FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParams);
+
+	AActor* HitActor = Hit.GetActor();
+	if (HitActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Trace hit actor: %s"), *HitActor->GetName());
+	}
 
 }
 
