@@ -40,13 +40,13 @@ void UGrabber::BeginPlay()
 		)
 	}
 	
-	if (GetOwner()->FindComponentByClass<UInputComponent>())
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+
+	if (InputComponent)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Found Input Component"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Did not find Input Component"));
+		UE_LOG(LogTemp, Warning, TEXT("Found Input Component on %s"), *GetOwner()->GetName());
+		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+		InputComponent->BindAction("Release", IE_Released, this, &UGrabber::Release);
 	}
 	
 	
@@ -73,10 +73,20 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	GetWorld()->LineTraceSingleByObjectType(OUT Hit,ViewPointLocation, LineTraceEnd, FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParams);
 
 	AActor* HitActor = Hit.GetActor();
+
 	if (HitActor)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Trace hit actor: %s"), *HitActor->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("Trace hit actor: %s"), *HitActor->GetName());
 	}
 
 }
 
+void UGrabber::Grab()
+{
+	UE_LOG(LogTemp, Error, TEXT("Grabber Pressed!"));
+}
+
+void UGrabber::Release()
+{
+	UE_LOG(LogTemp, Error, TEXT("Grabber Released!"));
+}
