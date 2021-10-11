@@ -74,12 +74,10 @@ void UGrabber::SetupInputComponent()
 
 FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
 {
-	FVector ViewPointLocation;
-	FRotator ViewPointRotation;
+	FVector ViewPointLocation;		// OUT parameter for player viewpoint
+	FRotator ViewPointRotation;		// OUT parameter for player viewpoint
 
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT ViewPointLocation, OUT ViewPointRotation);
-
-	// UE_LOG(LogTemp, Warning, TEXT("ViewPoint location: %s. ViewPoint rotation: %s"), *ViewPointLocation.ToString(), *ViewPointRotation.ToString());
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT ViewPointLocation, OUT ViewPointRotation);	// Player viewpoint
 
 	FVector LineTraceEnd = ViewPointLocation + ViewPointRotation.Vector() * Reach;
 
@@ -93,6 +91,8 @@ FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Trace hit actor: %s"), *HitActor->GetName());
 	}
-
+	else UE_LOG(LogTemp, Warning, TEXT("No actor with physics handle in reach."), *HitActor->GetName());
+	
 	return Hit;
+	
 }
