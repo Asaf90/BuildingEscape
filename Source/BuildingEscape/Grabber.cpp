@@ -20,8 +20,6 @@ UGrabber::UGrabber()
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// UE_LOG(LogTemp, Warning, TEXT("Grabber component initialized on %s"), *GetOwner()->GetName());
 	FindPhysicsHandle();	
 	SetupInputComponent();
 }
@@ -31,11 +29,10 @@ void UGrabber::BeginPlay()
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	FVector ViewPointLocation;		// OUT parameter for player viewpoint
-	FRotator ViewPointRotation;		// OUT parameter for player viewpoint
-
+	FVector ViewPointLocation;		// initialize OUT parameter for player viewpoint
+	FRotator ViewPointRotation;		// initialize OUT parameter for player viewpoint
+	// finding the line trace end in order to see which actor is in reach. to be refactored to a function as it repeats several times in the code.
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT ViewPointLocation, OUT ViewPointRotation);	// Player viewpoint
-
 	FVector LineTraceEnd = ViewPointLocation + ViewPointRotation.Vector() * Reach;
 	if (PhysicsHandle->GrabbedComponent)
 	{
@@ -47,14 +44,13 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 void UGrabber::Grab()
 {
-	UE_LOG(LogTemp, Error, TEXT("Grabber Pressed!"));
+	UE_LOG(LogTemp, Error, TEXT("Grabber Pressed!"));		// debug line to test if grabber is activated with key press
 
-	FVector ViewPointLocation;		// OUT parameter for player viewpoint
-	FRotator ViewPointRotation;		// OUT parameter for player viewpoint
-
+	FVector ViewPointLocation;		// initialize OUT parameter for player viewpoint
+	FRotator ViewPointRotation;		// initialize OUT parameter for player viewpoint
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT ViewPointLocation, OUT ViewPointRotation);	// Player viewpoint
-
 	FVector LineTraceEnd = ViewPointLocation + ViewPointRotation.Vector() * Reach;
+	// finding the line trace end in order to see which actor is in reach. to be refactored to a function as it repeats several times in the code.
 
 	FHitResult GrabbedBody = GetFirstPhysicsBodyInReach();
 	if (GrabbedBody.GetActor())
@@ -65,21 +61,17 @@ void UGrabber::Grab()
 
 void UGrabber::Release()
 {
-	UE_LOG(LogTemp, Error, TEXT("Grabber Released!"));
+	UE_LOG(LogTemp, Error, TEXT("Grabber Released!"));		// debug line to test if grabber is released with key release
 	if (PhysicsHandle->GrabbedComponent)
 	{
 		PhysicsHandle->ReleaseComponent();
 	}
 }
 
-void UGrabber::FindPhysicsHandle()
+void UGrabber::FindPhysicsHandle()				// If there is no physics handle for the actor, show an error code that explains how to fix it.
 {
 	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if (PhysicsHandle)
-	{
-		// Physics Handle is found.
-	}
-	else
+	if (!PhysicsHandle)
 	{
 		UE_LOG(LogTemp, 
 		Error, 
@@ -90,7 +82,7 @@ void UGrabber::FindPhysicsHandle()
 	}
 }
 
-void UGrabber::SetupInputComponent()
+void UGrabber::SetupInputComponent()			// Couple key press with action
 {
 	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
 
@@ -103,20 +95,19 @@ void UGrabber::SetupInputComponent()
 
 FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
 {
-	FVector ViewPointLocation;		// OUT parameter for player viewpoint
-	FRotator ViewPointRotation;		// OUT parameter for player viewpoint
-
+	FVector ViewPointLocation;		// initialize OUT parameter for player viewpoint
+	FRotator ViewPointRotation;		// initialize OUT parameter for player viewpoint
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT ViewPointLocation, OUT ViewPointRotation);	// Player viewpoint
-
 	FVector LineTraceEnd = ViewPointLocation + ViewPointRotation.Vector() * Reach;
+	// finding the line trace end in order to see which actor is in reach. to be refactored to a function as it repeats several times in the code.
 
-	FHitResult Hit;		// OUT parameter for the physics body hit result
+	FHitResult Hit;		// initialize OUT parameter for the physics body hit result
 	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
 	GetWorld()->LineTraceSingleByObjectType(OUT Hit, ViewPointLocation, LineTraceEnd, FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParams);
 
 	AActor* HitActor = Hit.GetActor();
 
-	if (HitActor)
+	if (HitActor)				// Debug line to see if the line trace hit an actor with a physics handle
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Trace hit actor: %s"), *HitActor->GetName());
 	}
